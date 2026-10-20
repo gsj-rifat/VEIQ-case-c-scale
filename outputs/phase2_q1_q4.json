@@ -1,0 +1,550 @@
+{
+  "definitions": {
+    "Q1_car_key": "lower(brand)|lower(model)|first_registration_year|mileage_km|round(power_kw)|seller_ref",
+    "Q1_on_market": "still_active=True after car_key dedupe (point-in-time supply)",
+    "Q2_outcome": "median days first_seen\u2192last_seen among status_raw='sold' only; exclude last_seen<first_seen; report pct still_active for censoring",
+    "Q2_primary_segment": "seller_type (largest separation); also price_band and body_type",
+    "Q3_age": "2026 - first_registration_year",
+    "Q3_controlled_for_mileage": "EUR/year-of-age slope from regr_slope(price, age) computed separately inside mileage bins 0-50k / 50-100k / 100-150k / 150k+",
+    "Q3_filters": "price 500\u2013150000; year 2005\u20132026; age 0\u201315",
+    "Q4_comparable": "brand|model|reg_year|fuel|body|mileage_bin with \u22653 private and \u22653 dealer; same price/year filters as Q3",
+    "Q4_gap": "median over cells of (median_private - median_dealer)"
+  },
+  "Q1": {
+    "n_listings": 1000000,
+    "n_listing_ids": 1000000,
+    "n_cars_all_time": 981920,
+    "n_cars_active": 360007,
+    "n_active_listings": 360091,
+    "duplicate_pairs": 18084,
+    "overlapping_pairs": 233,
+    "sequential_pairs": 17851,
+    "concurrent_cross_source_pairs": 210,
+    "headline_distinct_cars_on_market": 360007,
+    "headline_all_time_distinct_cars": 981920
+  },
+  "Q2": {
+    "fastest_segment": "private sellers (median 26 days to sold vs dealers 30)",
+    "by_seller_type": [
+      {
+        "seller_type": "private",
+        "n": 208165,
+        "n_sold": 16329.0,
+        "pct_still_active": 32.6,
+        "median_days_to_sold": 26.0
+      },
+      {
+        "seller_type": "dealer",
+        "n": 779717,
+        "n_sold": 57397.0,
+        "pct_still_active": 36.8,
+        "median_days_to_sold": 30.0
+      }
+    ],
+    "by_price_band": [
+      {
+        "price_band": "<10k",
+        "n": 456060,
+        "pct_still_active": 34.9,
+        "median_days_to_sold": 28.0
+      },
+      {
+        "price_band": "10-20k",
+        "n": 361509,
+        "pct_still_active": 36.2,
+        "median_days_to_sold": 30.0
+      },
+      {
+        "price_band": "20-35k",
+        "n": 148104,
+        "pct_still_active": 37.6,
+        "median_days_to_sold": 31.0
+      },
+      {
+        "price_band": "35k+",
+        "n": 22209,
+        "pct_still_active": 39.6,
+        "median_days_to_sold": 33.0
+      }
+    ],
+    "by_body_type": [
+      {
+        "body_type": "SUV",
+        "n": 215682,
+        "pct_still_active": 36.2,
+        "median_days_to_sold": 29.0
+      },
+      {
+        "body_type": "HATCHBACK",
+        "n": 686941,
+        "pct_still_active": 35.7,
+        "median_days_to_sold": 29.0
+      },
+      {
+        "body_type": "WAGON",
+        "n": 39997,
+        "pct_still_active": 36.4,
+        "median_days_to_sold": 30.0
+      },
+      {
+        "body_type": "SEDAN",
+        "n": 45262,
+        "pct_still_active": 36.4,
+        "median_days_to_sold": 31.0
+      }
+    ],
+    "by_fuel_type": [
+      {
+        "fuel_type": "diesel",
+        "n": 142402,
+        "pct_still_active": 36.2,
+        "median_days_to_sold": 29.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "n": 165755,
+        "pct_still_active": 36.0,
+        "median_days_to_sold": 29.0
+      },
+      {
+        "fuel_type": "electric",
+        "n": 91921,
+        "pct_still_active": 35.7,
+        "median_days_to_sold": 29.0
+      },
+      {
+        "fuel_type": "petrol",
+        "n": 587804,
+        "pct_still_active": 35.8,
+        "median_days_to_sold": 29.0
+      }
+    ],
+    "note": "Fuel types are nearly identical (~29d). Averaging only finished listings would ignore ~36% still-active censoring."
+  },
+  "Q3": {
+    "headline_eur_per_year_age_in_50_100k_km": {
+      "diesel": -2270.9,
+      "electric": -1575.9,
+      "hybrid": -1832.1,
+      "petrol": -1458.9
+    },
+    "slopes_within_mileage_bins": [
+      {
+        "fuel_type": "diesel",
+        "km_bin": "0-50k",
+        "n": 31584,
+        "eur_per_year_of_age": -3565.5,
+        "median_price": 24698.0
+      },
+      {
+        "fuel_type": "diesel",
+        "km_bin": "100-150k",
+        "n": 28115,
+        "eur_per_year_of_age": -1511.1,
+        "median_price": 10500.0
+      },
+      {
+        "fuel_type": "diesel",
+        "km_bin": "150k+",
+        "n": 35371,
+        "eur_per_year_of_age": -1051.4,
+        "median_price": 5600.0
+      },
+      {
+        "fuel_type": "diesel",
+        "km_bin": "50-100k",
+        "n": 42314,
+        "eur_per_year_of_age": -2270.9,
+        "median_price": 15750.0
+      },
+      {
+        "fuel_type": "electric",
+        "km_bin": "0-50k",
+        "n": 30830,
+        "eur_per_year_of_age": -3590.2,
+        "median_price": 18750.0
+      },
+      {
+        "fuel_type": "electric",
+        "km_bin": "100-150k",
+        "n": 15275,
+        "eur_per_year_of_age": -964.9,
+        "median_price": 6425.0
+      },
+      {
+        "fuel_type": "electric",
+        "km_bin": "150k+",
+        "n": 11968,
+        "eur_per_year_of_age": -688.8,
+        "median_price": 3700.0
+      },
+      {
+        "fuel_type": "electric",
+        "km_bin": "50-100k",
+        "n": 30452,
+        "eur_per_year_of_age": -1575.9,
+        "median_price": 10300.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "km_bin": "0-50k",
+        "n": 55916,
+        "eur_per_year_of_age": -3183.6,
+        "median_price": 21650.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "km_bin": "100-150k",
+        "n": 27060,
+        "eur_per_year_of_age": -1202.8,
+        "median_price": 8050.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "km_bin": "150k+",
+        "n": 21616,
+        "eur_per_year_of_age": -891.2,
+        "median_price": 4650.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "km_bin": "50-100k",
+        "n": 55161,
+        "eur_per_year_of_age": -1832.1,
+        "median_price": 12846.0
+      },
+      {
+        "fuel_type": "petrol",
+        "km_bin": "0-50k",
+        "n": 197999,
+        "eur_per_year_of_age": -2520.2,
+        "median_price": 16450.0
+      },
+      {
+        "fuel_type": "petrol",
+        "km_bin": "100-150k",
+        "n": 96508,
+        "eur_per_year_of_age": -975.2,
+        "median_price": 6293.0
+      },
+      {
+        "fuel_type": "petrol",
+        "km_bin": "150k+",
+        "n": 77020,
+        "eur_per_year_of_age": -699.9,
+        "median_price": 3700.0
+      },
+      {
+        "fuel_type": "petrol",
+        "km_bin": "50-100k",
+        "n": 195586,
+        "eur_per_year_of_age": -1458.9,
+        "median_price": 9917.0
+      }
+    ],
+    "median_price_curve_50_100k_km": [
+      {
+        "fuel_type": "diesel",
+        "age": 2,
+        "n": 1102,
+        "median_price": 26250.0
+      },
+      {
+        "fuel_type": "diesel",
+        "age": 3,
+        "n": 5886,
+        "median_price": 22404.0
+      },
+      {
+        "fuel_type": "diesel",
+        "age": 4,
+        "n": 9640,
+        "median_price": 19150.0
+      },
+      {
+        "fuel_type": "diesel",
+        "age": 5,
+        "n": 9454,
+        "median_price": 16342.0
+      },
+      {
+        "fuel_type": "diesel",
+        "age": 6,
+        "n": 6843,
+        "median_price": 14100.0
+      },
+      {
+        "fuel_type": "diesel",
+        "age": 7,
+        "n": 4263,
+        "median_price": 12100.0
+      },
+      {
+        "fuel_type": "diesel",
+        "age": 8,
+        "n": 2388,
+        "median_price": 10474.0
+      },
+      {
+        "fuel_type": "diesel",
+        "age": 9,
+        "n": 1345,
+        "median_price": 8850.0
+      },
+      {
+        "fuel_type": "diesel",
+        "age": 10,
+        "n": 701,
+        "median_price": 7762.0
+      },
+      {
+        "fuel_type": "diesel",
+        "age": 11,
+        "n": 333,
+        "median_price": 7068.0
+      },
+      {
+        "fuel_type": "diesel",
+        "age": 12,
+        "n": 194,
+        "median_price": 5224.0
+      },
+      {
+        "fuel_type": "electric",
+        "age": 2,
+        "n": 195,
+        "median_price": 22876.0
+      },
+      {
+        "fuel_type": "electric",
+        "age": 3,
+        "n": 1800,
+        "median_price": 18535.0
+      },
+      {
+        "fuel_type": "electric",
+        "age": 4,
+        "n": 4457,
+        "median_price": 15150.0
+      },
+      {
+        "fuel_type": "electric",
+        "age": 5,
+        "n": 5937,
+        "median_price": 12345.0
+      },
+      {
+        "fuel_type": "electric",
+        "age": 6,
+        "n": 5722,
+        "median_price": 10650.0
+      },
+      {
+        "fuel_type": "electric",
+        "age": 7,
+        "n": 4503,
+        "median_price": 9100.0
+      },
+      {
+        "fuel_type": "electric",
+        "age": 8,
+        "n": 3139,
+        "median_price": 7900.0
+      },
+      {
+        "fuel_type": "electric",
+        "age": 9,
+        "n": 1994,
+        "median_price": 6750.0
+      },
+      {
+        "fuel_type": "electric",
+        "age": 10,
+        "n": 1213,
+        "median_price": 5729.0
+      },
+      {
+        "fuel_type": "electric",
+        "age": 11,
+        "n": 739,
+        "median_price": 4950.0
+      },
+      {
+        "fuel_type": "electric",
+        "age": 12,
+        "n": 374,
+        "median_price": 4300.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "age": 2,
+        "n": 369,
+        "median_price": 25000.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "age": 3,
+        "n": 3222,
+        "median_price": 21200.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "age": 4,
+        "n": 8201,
+        "median_price": 18200.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "age": 5,
+        "n": 10989,
+        "median_price": 15750.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "age": 6,
+        "n": 10260,
+        "median_price": 13400.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "age": 7,
+        "n": 8040,
+        "median_price": 11550.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "age": 8,
+        "n": 5628,
+        "median_price": 9800.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "age": 9,
+        "n": 3514,
+        "median_price": 8508.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "age": 10,
+        "n": 2187,
+        "median_price": 7300.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "age": 11,
+        "n": 1299,
+        "median_price": 6288.0
+      },
+      {
+        "fuel_type": "hybrid",
+        "age": 12,
+        "n": 714,
+        "median_price": 5300.0
+      },
+      {
+        "fuel_type": "petrol",
+        "age": 2,
+        "n": 1196,
+        "median_price": 17332.0
+      },
+      {
+        "fuel_type": "petrol",
+        "age": 3,
+        "n": 11626,
+        "median_price": 15209.0
+      },
+      {
+        "fuel_type": "petrol",
+        "age": 4,
+        "n": 29019,
+        "median_price": 13200.0
+      },
+      {
+        "fuel_type": "petrol",
+        "age": 5,
+        "n": 38769,
+        "median_price": 11400.0
+      },
+      {
+        "fuel_type": "petrol",
+        "age": 6,
+        "n": 36580,
+        "median_price": 9750.0
+      },
+      {
+        "fuel_type": "petrol",
+        "age": 7,
+        "n": 28160,
+        "median_price": 8350.0
+      },
+      {
+        "fuel_type": "petrol",
+        "age": 8,
+        "n": 19901,
+        "median_price": 7150.0
+      },
+      {
+        "fuel_type": "petrol",
+        "age": 9,
+        "n": 12708,
+        "median_price": 6150.0
+      },
+      {
+        "fuel_type": "petrol",
+        "age": 10,
+        "n": 7829,
+        "median_price": 5250.0
+      },
+      {
+        "fuel_type": "petrol",
+        "age": 11,
+        "n": 4566,
+        "median_price": 4549.0
+      },
+      {
+        "fuel_type": "petrol",
+        "age": 12,
+        "n": 2564,
+        "median_price": 3804.0
+      }
+    ]
+  },
+  "Q4": {
+    "n_comparable_cells": 5247,
+    "median_gap_eur": -505.0,
+    "mean_gap_eur": -717.0,
+    "median_gap_pct": -7.04,
+    "pct_cells_private_cheaper": 89.8,
+    "interpretation": "Yes \u2014 on comparable cars, private medians are about \u20ac505 / 7% below dealer medians (cell-level median gap).",
+    "by_fuel": [
+      {
+        "fuel_type": "diesel",
+        "n_cells": 1298,
+        "median_gap_eur": -600.0,
+        "median_gap_pct": -6.85
+      },
+      {
+        "fuel_type": "electric",
+        "n_cells": 623,
+        "median_gap_eur": -400.0,
+        "median_gap_pct": -7.02
+      },
+      {
+        "fuel_type": "hybrid",
+        "n_cells": 1389,
+        "median_gap_eur": -550.0,
+        "median_gap_pct": -7.07
+      },
+      {
+        "fuel_type": "petrol",
+        "n_cells": 1937,
+        "median_gap_eur": -452.0,
+        "median_gap_pct": -7.12
+      }
+    ]
+  },
+  "budget": {
+    "elapsed_sec": 8.53,
+    "peak_rss_mb": 101.6
+  }
+}
