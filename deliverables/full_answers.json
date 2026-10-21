@@ -1,0 +1,158 @@
+{
+  "Q1": {
+    "definition": "car_key=brand|model|year|mileage|round(power_kw)|seller_ref; on-market=still_active deduped",
+    "distinct_cars_on_market": 360007,
+    "all_time_distinct_cars": 981920,
+    "active_listings": 360091,
+    "duplicate_pairs": 18084,
+    "concurrent_cross_source_pairs": 210,
+    "sequential_pairs": 17851
+  },
+  "Q2": {
+    "definition": "median days among status_raw=sold; drop inverted dates; report pct still_active",
+    "fastest": "private sellers (26d) vs dealers (30d)",
+    "by_seller_type": [
+      {
+        "seller_type": "private",
+        "n": 208165,
+        "pct_still_active": 32.6,
+        "median_days_to_sold": 26.0
+      },
+      {
+        "seller_type": "dealer",
+        "n": 779717,
+        "pct_still_active": 36.8,
+        "median_days_to_sold": 30.0
+      }
+    ],
+    "by_price_band": [
+      {
+        "price_band": "<10k",
+        "median_days_to_sold": 28.0,
+        "pct_still_active": 34.9
+      },
+      {
+        "price_band": "10-20k",
+        "median_days_to_sold": 30.0,
+        "pct_still_active": 36.2
+      },
+      {
+        "price_band": "20-35k",
+        "median_days_to_sold": 31.0,
+        "pct_still_active": 37.6
+      },
+      {
+        "price_band": "35k+",
+        "median_days_to_sold": 33.0,
+        "pct_still_active": 39.6
+      }
+    ],
+    "uncertainty": "\u224836% listings still active (censored); some 'sold' later relist"
+  },
+  "Q3": {
+    "definition": "age=2026-year; controlled-for-mileage=regr_slope(price,age) inside 50-100k km band; filters price 500-150k, year 2005-2026",
+    "eur_per_year_of_age_50_100k_km": {
+      "diesel": -2270.9,
+      "electric": -1575.9,
+      "hybrid": -1832.1,
+      "petrol": -1458.9
+    }
+  },
+  "Q4": {
+    "definition": "comparable=brand|model|year|fuel|body|mileage_bin \u22653 each side; gap=median(med_private-med_dealer)",
+    "n_comparable_cells": 5247,
+    "median_gap_eur": -505.0,
+    "median_gap_pct": -7.04,
+    "pct_cells_private_cheaper": 89.8,
+    "interpretation": "Yes \u2014 private undercuts dealers by ~\u20ac505 / ~7%."
+  },
+  "Q5": {
+    "issues": [
+      {
+        "id": 1,
+        "issue": "Placeholder / \u20ac1 asking prices",
+        "evidence": {
+          "price_le_1": 3981,
+          "price_lt_500": 7860,
+          "mean_price_raw_vs_clean": {
+            "raw": 12417.0,
+            "clean_ge_500": 12515.0
+          }
+        },
+        "breaks": [
+          "Q3",
+          "Q4"
+        ],
+        "how": "\u20ac1 'call me' ads pull means down (~\u20ac100 across fuels). Medians are more robust; we exclude price < \u20ac500 from Q3/Q4.",
+        "handled_in_answers": true
+      },
+      {
+        "id": 2,
+        "issue": "Impossible first_registration_year (1900, 2027, 2028)",
+        "evidence": {
+          "year_1900": 968,
+          "year_gt_2026": 1943
+        },
+        "breaks": [
+          "Q3",
+          "Q4"
+        ],
+        "how": "Future years yield negative age under ref 2026; 1900 yields age\u2248126. Destroys depreciation slopes if included. Filtered to 2005\u20132026.",
+        "handled_in_answers": true
+      },
+      {
+        "id": 3,
+        "issue": "Inverted dates (last_seen < first_seen)",
+        "evidence": {
+          "inverted_dates": 4284
+        },
+        "breaks": [
+          "Q2"
+        ],
+        "how": "Negative durations corrupt time-on-market. Dropped from Q2 duration stats.",
+        "handled_in_answers": true
+      },
+      {
+        "id": 4,
+        "issue": "Relists after 'sold' / short spells (fake liquidity)",
+        "evidence": {
+          "sequential_relist_pairs": 18078,
+          "prior_spell_marked_sold": 2144,
+          "prior_spell_le_7d": 2116,
+          "same_source_relist": 17862
+        },
+        "breaks": [
+          "Q2",
+          "Q1"
+        ],
+        "how": "Same car_key reappears after a 'sold' or short spell \u2014 sold is not always a true exit. Inflates listing count vs cars (Q1) and can fake quick sales (Q2). Q1 uses car_key dedupe; Q2 uses sold median but treat sold-with-relist as uncertain.",
+        "handled_in_answers": "partial \u2014 Q1 dedupes; Q2 median stable but reliability flagged"
+      },
+      {
+        "id": 5,
+        "issue": "Null power_kw (~28% of rows)",
+        "evidence": {
+          "power_kw_null": 279355
+        },
+        "breaks": [
+          "Q1"
+        ],
+        "how": "Car key maps null power \u2192 'NA', so distinct cars with missing power can collide if other fields match. Supply may be slightly understated.",
+        "handled_in_answers": "flagged \u2014 key still best available fingerprint"
+      }
+    ],
+    "pathology_counts": {
+      "price_le_1": 3981,
+      "price_lt_500": 7860,
+      "year_1900": 968,
+      "year_gt_2026": 1943,
+      "inverted_dates": 4284,
+      "power_kw_null": 279355
+    }
+  },
+  "budget": {
+    "elapsed_sec": 10.55,
+    "peak_rss_mb": 104.6,
+    "memory_limit_set": "1800MB"
+  }
+}
