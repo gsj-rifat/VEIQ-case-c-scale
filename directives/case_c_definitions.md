@@ -1,6 +1,6 @@
-# Case C — Q1–Q4 analysis definitions
+# Case C: Q1-Q4 analysis definitions
 
-Operational constraints for Phase 2 answers. Do not change headline metrics without updating this file and re-running `scripts/phase2_answers.py`.
+Operational constraints for Phase 2 answers. Do not change headline metrics without updating this file and re-running `scripts/full_answers.py`.
 
 ## Budget
 
