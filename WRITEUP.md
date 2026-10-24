@@ -15,7 +15,7 @@
 ### Q2: Liquidity
 **Definition:** Median days `first_seen → last_seen` among `status_raw='sold'` only; drop inverted dates; always report `% still_active` (~36% censored). Do not average only finished listings.
 
-**Answer:** **Private sellers are fastest (26d median to sold)** vs dealers **30d**. Cheaper bands sell faster (`<10k` 28d → `35k+` 33d). Fuel types are essentially flat (~29d). **Uncertainty:** some “sold” spells later relist (Q5#4) — treat absolute days as directional, not causal.
+**Answer:** **Private sellers are fastest (26d median to sold)** vs dealers **30d**. Cheaper bands sell faster (`<10k` 28d → `35k+` 33d). Fuel types are essentially flat (~29d). **Uncertainty:** some “sold” spells later relist (Q5#4), so treat absolute days as directional, not causal. **Limitation:** the median is taken over sold listings only (about 7% of rows; 56% are `removed`), so it is conditional on a listing finishing as sold. A survival (Kaplan-Meier) comparison that uses all listings would be the next step.
 
 ---
 
