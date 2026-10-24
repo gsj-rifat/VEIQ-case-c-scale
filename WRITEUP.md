@@ -54,8 +54,8 @@ Keep aggregates in DuckDB/SQL over partitioned parquet; never materialize full f
 
 ### Use of AI
 
-I used Cursor to write and iterate on the DuckDB/SQL and pandas glue code — boilerplate, syntax, query drafts. The decisions were mine, checked against the data, not generated:
-- **Q1:** tested 4 candidate dedupe keys before picking one — including price collapsed distinct cars to 999,997 (proving price had to be excluded); dropping `seller_ref` over-merged different sellers' identical cars.
-- **Q3:** price correlated with both age (−0.75) and mileage (−0.65) at once, so a pooled age slope is confounded — split into mileage bins myself and confirmed the depreciation rate itself changes by band before calling it "controlled for mileage."
+I used Cursor to write and iterate on the DuckDB/SQL and pandas glue code (boilerplate, syntax, query drafts). The decisions were mine, checked against the data, not generated:
+- **Q1:** tested 4 candidate dedupe keys before picking one. Including price collapsed distinct cars to 999,997 (proving price had to be excluded), and dropping `seller_ref` over-merged different sellers' identical cars.
+- **Q3:** price correlated with both age (−0.75) and mileage (−0.65) at once, so a pooled age slope is confounded, so I split it into mileage bins myself and confirmed the depreciation rate itself changes by band before calling it "controlled for mileage."
 - **Q4:** ran the €505 gap through a min-cell-size sweep (1/3/5/10 listings/side) to rule out a knife-edge threshold before trusting it.
 - **Q5:** every pathology count, and whether it actually moved a headline number (e.g. relists *not* moving the Q2 median), was a query I ran and read myself.
