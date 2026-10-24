@@ -29,7 +29,7 @@
 ### Q4: Private vs dealer
 **Definition:** Comparable cell = `brand|model|year|fuel|body|mileage_bin` with ≥3 private and ≥3 dealer (same filters as Q3). Gap = median over cells of `(median_private − median_dealer)`.
 
-**Answer:** **Yes — private undercuts by €505 (−7.0%)** on **5,247** cells; private cheaper in **~90%** of cells. Gap stable for cell-size thresholds 1–10. Unmatched overall medians are *not* the answer (mix differs).
+**Answer:** **Yes, private undercuts by €505 (−7.0%)** on **5,247** cells; private cheaper in **~90%** of cells. The direction holds for cell-size thresholds 1 to 10; the size moves from €463 to €580. Unmatched overall medians are *not* the answer (mix differs).
 
 ---
 
